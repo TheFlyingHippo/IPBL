@@ -4,7 +4,6 @@ public class EngineeringModelsProduction implements EngineeringModel {
 
 	@Override
 	public PerformanceData getPerformanceData(int windSpeed, WindGenerator windGenerator) {
-		// TODO Auto-generated method stub
 		double power = 0;
 		double effiency = 0;
 		double gearedWindSpeed = windSpeed * windGenerator.getGearPackage().getGearingRatio();
@@ -46,13 +45,17 @@ public class EngineeringModelsProduction implements EngineeringModel {
 			}
 			effiencyRange = 19;
 		}
-
-		if (gearedWindSpeed < windGenerator.getGeneratorPackage().getCutIn()) {
+		
+		if (power > windGenerator.getGeneratorPackage().getpMax()){
+			power =  windGenerator.getGeneratorPackage().getpMax();
+			}
+		
+		if (power >= windGenerator.getGeneratorPackage().getpMax()) {
+			status = Status.SWEETSPOT;
+		} else if (gearedWindSpeed < windGenerator.getGeneratorPackage().getCutIn()) {
 			status = Status.BELOWWINDTHRESHOLD;
 		} else if (gearedWindSpeed < effiencyRange) {
 			status = Status.ABOVEWINDTHRESHOLD;
-		} else if (power == windGenerator.getGeneratorPackage().getpMax()) {
-			status = Status.SWEETSPOT;
 		} else if (gearedWindSpeed > windGenerator.getGeneratorPackage().getShutdownSpeed()) {
 			status = Status.SHUTDOWN;
 		}
@@ -60,6 +63,7 @@ public class EngineeringModelsProduction implements EngineeringModel {
 		effiency = (power / windGenerator.getGeneratorPackage().getpMax()) * 100;
 
 		return new PerformanceData(effiency, status, power, windGenerator);
+
 
 	}
 }
